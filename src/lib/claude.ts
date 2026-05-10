@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Temperature, ActivityType } from "@/types";
+import { HAYDE_SYSTEM_CONTEXT, HAYDE_CACHE_CONTROL } from "./hayde-context";
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 
@@ -52,12 +53,20 @@ export async function classifyLead(
     .join("\n");
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6-20250514",
+    model: "claude-opus-4-7",
     max_tokens: 500,
+    thinking: { type: "adaptive" },
+    system: [
+      {
+        type: "text",
+        text: HAYDE_SYSTEM_CONTEXT,
+        cache_control: HAYDE_CACHE_CONTROL,
+      },
+    ],
     messages: [
       {
         role: "user",
-        content: `Analiza este lead y clasifica su temperatura. Responde SOLO con JSON valido.
+        content: `Analiza este lead usando el sistema HAYDE y clasifica su temperatura. Responde SOLO con JSON valido.
 
 Contacto:
 - Nombre: ${contactInfo.name}
@@ -72,16 +81,16 @@ Responde con este formato JSON exacto:
 {
   "temperature": "cold" | "warm" | "hot",
   "score": <numero 0-100>,
-  "nextAction": "<siguiente accion recomendada en espanol>",
-  "reasoning": "<razon de la clasificacion en espanol>"
+  "nextAction": "<siguiente accion recomendada según sistema HAYDE>",
+  "reasoning": "<razon basada en variables HAYDE: estado relacional, fuente, interacciones>"
 }`,
       },
     ],
   });
 
   try {
-    const text =
-      response.content[0].type === "text" ? response.content[0].text : "";
+    const textBlock = response.content.find((b) => b.type === "text");
+    const text = textBlock?.type === "text" ? textBlock.text : "";
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]) as ClassifyResult;

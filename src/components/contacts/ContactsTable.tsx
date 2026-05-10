@@ -27,6 +27,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [filterTemp, setFilterTemp] = useState<Temperature | "">("");
+  const [filterEstado, setFilterEstado] = useState("");
 
   const filtered = contacts.filter((c) => {
     const matchesSearch =
@@ -36,8 +37,9 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
       c.company?.toLowerCase().includes(search.toLowerCase());
 
     const matchesTemp = !filterTemp || c.temperature === filterTemp;
+    const matchesEstado = !filterEstado || (c as unknown as Record<string, unknown>).estadoRelacion === filterEstado;
 
-    return matchesSearch && matchesTemp;
+    return matchesSearch && matchesTemp && matchesEstado;
   });
 
   if (contacts.length === 0) {
@@ -64,7 +66,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
             className="pl-9"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(["", "hot", "warm", "cold"] as const).map((temp) => (
             <Button
               key={temp}
@@ -76,6 +78,23 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
               {temp === "" ? "Todos" : temp === "hot" ? "Caliente" : temp === "warm" ? "Tibio" : "Frio"}
             </Button>
           ))}
+          <select
+            value={filterEstado}
+            onChange={(e) => setFilterEstado(e.target.value)}
+            className="text-sm border rounded-md px-2 py-1 bg-background cursor-pointer"
+          >
+            <option value="">Todos los estados</option>
+            <option value="lead_nuevo">Nuevo</option>
+            <option value="lead_frio">Frío</option>
+            <option value="lead_tibio">Tibio</option>
+            <option value="lead_caliente">Caliente</option>
+            <option value="lead_calificado_asesoria_1a1">Calificado</option>
+            <option value="cliente_guia">Cliente guía</option>
+            <option value="cliente_recurrente">Recurrente</option>
+            <option value="cliente_premium">Premium</option>
+            <option value="candidato_comunidad">Comunidad</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
           <Button
             variant="outline"
             size="sm"
@@ -96,6 +115,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
               <TableHead className="hidden sm:table-cell">Empresa</TableHead>
               <TableHead className="hidden md:table-cell">Fuente</TableHead>
               <TableHead>Temperatura</TableHead>
+              <TableHead className="hidden md:table-cell">Estado EI</TableHead>
               <TableHead className="hidden md:table-cell">Score</TableHead>
               <TableHead className="hidden lg:table-cell">Fecha</TableHead>
             </TableRow>
@@ -123,6 +143,27 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
                 </TableCell>
                 <TableCell>
                   <StatusBadge temperature={contact.temperature as Temperature} size="sm" />
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {(() => {
+                    const estado = (contact as unknown as Record<string, unknown>).estadoRelacion as string;
+                    const labels: Record<string, string> = {
+                      lead_nuevo: "Nuevo", lead_frio: "Frío", lead_tibio: "Tibio",
+                      lead_caliente: "Caliente", lead_calificado_asesoria_1a1: "Calificado",
+                      cliente_guia: "Guía", cliente_recurrente: "Recurrente",
+                      cliente_premium: "Premium", candidato_comunidad: "Comunidad", inactivo: "Inactivo",
+                    };
+                    const colors: Record<string, string> = {
+                      lead_nuevo: "bg-slate-100 text-slate-700", lead_frio: "bg-blue-50 text-blue-700",
+                      lead_tibio: "bg-yellow-50 text-yellow-700", lead_caliente: "bg-orange-50 text-orange-700",
+                      lead_calificado_asesoria_1a1: "bg-purple-50 text-purple-700",
+                      cliente_guia: "bg-green-50 text-green-700", cliente_recurrente: "bg-green-100 text-green-800",
+                      cliente_premium: "bg-emerald-100 text-emerald-800", candidato_comunidad: "bg-indigo-50 text-indigo-700",
+                      inactivo: "bg-gray-100 text-gray-500",
+                    };
+                    if (!estado) return <span className="text-xs text-muted-foreground">-</span>;
+                    return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colors[estado] || "bg-slate-100 text-slate-700"}`}>{labels[estado] || estado}</span>;
+                  })()}
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
                   <div className="flex items-center gap-1">

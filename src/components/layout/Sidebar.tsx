@@ -9,16 +9,23 @@ import {
   Activity,
   Settings,
   Briefcase,
+  ShoppingCart,
+  Megaphone,
+  CheckSquare,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/pipeline", label: "Pipeline", icon: Kanban },
   { href: "/contacts", label: "Contactos", icon: Users },
-  { href: "/deals", label: "Deals", icon: Briefcase },
+  { href: "/pipeline", label: "Pipeline", icon: Kanban },
+  { href: "/ventas", label: "Ventas", icon: ShoppingCart },
+  { href: "/contenido", label: "Contenido", icon: Megaphone },
+  { href: "/tareas", label: "Tareas", icon: CheckSquare },
+  { href: "/decisiones", label: "Decisiones", icon: Zap },
   { href: "/activities", label: "Actividades", icon: Activity },
-  { href: "/settings", label: "Configuracion", icon: Settings },
+  { href: "/settings", label: "Configuración", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -56,10 +63,10 @@ export function Sidebar() {
 
       <div className="px-4 py-4 border-t border-[var(--sidebar-border)]">
         <p className="text-xs text-[var(--sidebar-foreground)]/50">
-          Auto-CRM v1.0
+          CRM EI v2.0
         </p>
         <p className="text-xs text-[var(--sidebar-foreground)]/50">
-          Powered by Claude
+          Evoluciona Inteligente
         </p>
       </div>
     </aside>

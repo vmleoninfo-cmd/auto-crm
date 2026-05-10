@@ -39,40 +39,59 @@ const activityIcons: Record<string, typeof Phone> = {
 
 interface ContactDetailClientProps {
   contact: {
-    id: string;
-    name: string;
-    email: string | null;
-    phone: string | null;
-    company: string | null;
-    source: string;
-    temperature: string;
-    score: number;
-    notes: string | null;
-    createdAt: number | Date;
+    id: string; name: string; email: string | null; phone: string | null;
+    company: string | null; source: string; temperature: string; score: number;
+    notes: string | null; createdAt: number | Date;
+    estadoRelacion?: string | null; valorGenerado?: number | null;
+    totalCompras?: number | null; utmCampaign?: string | null;
+    ultimaInteraccionAt?: number | Date | null;
   };
   deals: Array<{
-    id: string;
-    title: string;
-    value: number;
-    probability: number;
-    stageName: string | null;
-    stageColor: string | null;
-    createdAt: number | Date;
+    id: string; title: string; value: number; probability: number;
+    stageName: string | null; stageColor: string | null; createdAt: number | Date;
   }>;
   activities: Array<{
-    id: string;
-    type: string;
-    description: string;
-    scheduledAt: number | Date | null;
-    completedAt: number | Date | null;
-    createdAt: number | Date;
+    id: string; type: string; description: string;
+    scheduledAt: number | Date | null; completedAt: number | Date | null; createdAt: number | Date;
+  }>;
+  purchases: Array<{
+    id: string; producto: string; monto: number; plataforma: string;
+    estadoPago: string; createdAt: number | Date;
+  }>;
+  automations: Array<{
+    id: string; tipo: string; canal: string; estado: string; createdAt: number | Date;
   }>;
 }
 
+function computeHaydeScores(contact: ContactDetailClientProps["contact"]) {
+  const fuenteScore: Record<string, number> = {
+    referido: 4.5, gumroad: 4.0, evento: 3.8, webhook: 3.5,
+    redes_sociales: 3.2, formulario: 3.0, website: 2.8,
+    whatsapp: 3.0, email: 2.8, llamada_fria: 2.5, import: 2.5, otro: 2.5,
+  };
+  const estadoScore: Record<string, number> = {
+    inactivo: 2.0, lead_frio: 2.5, lead_nuevo: 3.0, lead_tibio: 3.3,
+    lead_caliente: 3.7, lead_calificado_asesoria_1a1: 4.0,
+    cliente_guia: 4.2, candidato_comunidad: 4.3,
+    cliente_recurrente: 4.5, cliente_premium: 4.8,
+  };
+  const base = Math.min(5, +(((fuenteScore[contact.source] || 2.5) * 0.6 + (contact.score / 100) * 2)).toFixed(1));
+  const estructural = estadoScore[contact.estadoRelacion || "lead_nuevo"] || 3.0;
+  const capBase = (contact.totalCompras || 0) > 0 ? 3.8 : ((contact.valorGenerado || 0) > 0 ? 3.5 : 3.3);
+  const capacidad = Math.min(5, +(capBase + (contact.totalCompras || 0) * 0.2).toFixed(1));
+  return { base, estructural, capacidad };
+}
+
+function activacionLabel(capacidad: number) {
+  if (capacidad <= 3.2) return { label: "Activación editorial", color: "text-blue-700 bg-blue-50 border-blue-200" };
+  if (capacidad <= 3.7) return { label: "Requiere conversación", color: "text-yellow-700 bg-yellow-50 border-yellow-200" };
+  if (capacidad <= 4.2) return { label: "Apto Fase 1 — $450K CLP", color: "text-green-700 bg-green-50 border-green-200" };
+  if (capacidad <= 4.6) return { label: "Apto Sistema Completo — $750K CLP", color: "text-emerald-700 bg-emerald-50 border-emerald-200" };
+  return { label: "Apto Expansión — $1M+ CLP", color: "text-purple-700 bg-purple-50 border-purple-200" };
+}
+
 export function ContactDetailClient({
-  contact,
-  deals,
-  activities,
+  contact, deals, activities, purchases, automations,
 }: ContactDetailClientProps) {
   const router = useRouter();
   const [showEditForm, setShowEditForm] = useState(false);
@@ -343,6 +362,66 @@ export function ContactDetailClient({
           </CardContent>
         </Card>
       </div>
+
+      {/* Panel HAYDE */}
+      {(() => {
+        const scores = computeHaydeScores(contact);
+        const activacion = activacionLabel(scores.capacidad);
+        return (
+          <div className="rounded-lg border p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold">Diagnóstico HAYDE</p>
+              <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${activacion.color}`}>{activacion.label}</span>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { label: "BASE", score: scores.base, desc: "Claridad de oferta e identidad", threshold: [2.0, 3.0] },
+                { label: "ESTRUCTURAL", score: scores.estructural, desc: "Capacidad operativa y proceso", threshold: [3.0, 3.7] },
+                { label: "CAPACIDAD", score: scores.capacidad, desc: "Potencial de inversión HT", threshold: [3.2, 3.8] },
+              ].map(({ label, score, desc, threshold }) => {
+                const color = score < threshold[0] ? "text-red-600" : score < threshold[1] ? "text-yellow-600" : "text-green-600";
+                const bg = score < threshold[0] ? "bg-red-50" : score < threshold[1] ? "bg-yellow-50" : "bg-green-50";
+                return (
+                  <div key={label} className={`rounded-lg p-3 ${bg} space-y-1`}>
+                    <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+                    <p className={`text-2xl font-bold ${color}`}>{score.toFixed(1)}</p>
+                    <div className="h-1.5 rounded-full bg-white/60">
+                      <div className={`h-1.5 rounded-full ${score < threshold[0] ? "bg-red-400" : score < threshold[1] ? "bg-yellow-400" : "bg-green-500"}`} style={{ width: `${(score / 5) * 100}%` }} />
+                    </div>
+                    <p className="text-xs text-muted-foreground">{desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+            {contact.utmCampaign && (
+              <p className="text-xs text-muted-foreground">UTM: <span className="font-mono">{contact.utmCampaign}</span></p>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Timeline enriquecida */}
+      {(purchases.length > 0 || automations.length > 0) && (
+        <div className="rounded-lg border p-4 space-y-3">
+          <p className="text-sm font-semibold">Historia relacional</p>
+          <div className="space-y-3">
+            {[
+              ...purchases.map((p) => ({ date: p.createdAt, tipo: "compra" as const, titulo: `Compra: ${p.producto}`, sub: `$${Math.round(p.monto / 100).toLocaleString("es-CL")} CLP · ${p.plataforma}`, color: "text-green-600 bg-green-50" })),
+              ...automations.map((a) => ({ date: a.createdAt, tipo: "auto" as const, titulo: `Automatización: ${a.tipo}`, sub: `${a.canal} · ${a.estado}`, color: "text-blue-600 bg-blue-50" })),
+            ]
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 mt-0.5 ${item.color}`}>{item.tipo}</span>
+                  <div>
+                    <p className="text-sm font-medium">{item.titulo}</p>
+                    <p className="text-xs text-muted-foreground">{item.sub} · {formatRelativeDate(item.date)}</p>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
 
       <ContactForm
         open={showEditForm}

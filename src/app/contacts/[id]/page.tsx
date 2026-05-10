@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { contacts, deals, activities, pipelineStages } from "@/db/schema";
+import { contacts, deals, activities, pipelineStages, purchases, automationLogs } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { ContactDetailClient } from "@/components/contacts/ContactDetail";
@@ -39,11 +39,27 @@ export default async function ContactDetailPage({
     .orderBy(desc(activities.createdAt))
     .all();
 
+  const contactPurchases = db
+    .select()
+    .from(purchases)
+    .where(eq(purchases.contactId, id))
+    .orderBy(desc(purchases.createdAt))
+    .all();
+
+  const contactAutomations = db
+    .select()
+    .from(automationLogs)
+    .where(eq(automationLogs.contactId, id))
+    .orderBy(desc(automationLogs.createdAt))
+    .all();
+
   return (
     <ContactDetailClient
       contact={contact as Parameters<typeof ContactDetailClient>[0]["contact"]}
       deals={contactDeals as Parameters<typeof ContactDetailClient>[0]["deals"]}
       activities={contactActivities as Parameters<typeof ContactDetailClient>[0]["activities"]}
+      purchases={contactPurchases as Parameters<typeof ContactDetailClient>[0]["purchases"]}
+      automations={contactAutomations as Parameters<typeof ContactDetailClient>[0]["automations"]}
     />
   );
 }

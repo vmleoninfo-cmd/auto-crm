@@ -13,9 +13,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Auto-CRM - Tu CRM con Inteligencia Artificial",
+  title: "Tools Smarts CRM",
   description:
-    "CRM conversacional con pipeline de ventas, clasificacion automatica de leads y seguimiento inteligente. Construido con Claude Code.",
+    "CRM de ventas inteligente para negocios con Meta Ads y Google Ads. Parte del stack Tools Smarts by Evoluciona Inteligente.",
 };
 
 export default function RootLayout({

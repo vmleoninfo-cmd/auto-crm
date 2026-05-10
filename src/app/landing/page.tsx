@@ -1,4 +1,4 @@
-// LANDING PAGE — Evoluciona Inteligente
+// LANDING PAGE — Smart Tools
 // Estructura base para diseño visual. Secciones definidas con contenido real HAYDE.
 // Llevar a Claude Code Design para tratamiento visual.
 
@@ -12,7 +12,7 @@ export default function LandingPage() {
       ═══════════════════════════════════════════ */}
       <nav>
         <div className="logo">
-          <span>Evoluciona Inteligente</span>
+          <span>Smart Tools</span>
         </div>
         <ul>
           <li><a href="#como-funciona">Cómo funciona</a></li>
@@ -38,7 +38,7 @@ export default function LandingPage() {
         </h1>
 
         <p className="subheadline">
-          Evoluciona Inteligente construye el sistema estructural que convierte
+          Smart Tools construye el sistema estructural que convierte
           tu experiencia en un lenguaje claro, consistente y que atrae
           a los clientes correctos — sin depender de la inspiración del día.
         </p>
@@ -144,7 +144,7 @@ export default function LandingPage() {
               </ul>
             </div>
             <div className="con-sistema">
-              <h4>Con sistema EI</h4>
+              <h4>Con sistema Smart Tools</h4>
               <ul>
                 <li>Contenido con propósito y trazabilidad</li>
                 <li>Identidad verbal propia y consistente</li>
@@ -424,7 +424,7 @@ export default function LandingPage() {
       ═══════════════════════════════════════════ */}
       <footer>
         <div className="footer-logo">
-          <strong>Evoluciona Inteligente</strong>
+          <strong>Smart Tools</strong>
           <span>Sistema de identidad y contenido para negocios</span>
         </div>
 
@@ -441,7 +441,7 @@ export default function LandingPage() {
         </div>
 
         <p className="copyright">
-          © {new Date().getFullYear()} Evoluciona Inteligente. Todos los derechos reservados.
+          © {new Date().getFullYear()} Smart Tools. Todos los derechos reservados.
         </p>
       </footer>
 

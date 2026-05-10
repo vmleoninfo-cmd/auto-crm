@@ -13,9 +13,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Tools Smarts CRM",
+  title: "Smart Tools CRM",
   description:
-    "CRM de ventas inteligente para negocios con Meta Ads y Google Ads. Parte del stack Tools Smarts by Evoluciona Inteligente.",
+    "CRM de ventas inteligente para negocios con Meta Ads y Google Ads. Parte del stack Smart Tools by Evoluciona Inteligente.",
 };
 
 export default function RootLayout({

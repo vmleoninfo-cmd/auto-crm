@@ -26,5 +26,5 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV HOSTNAME="0.0.0.0"
 
-# Init DB on first run (if not exists), then start
-CMD sh -c "[ -f /app/data/crm.db ] || npx tsx scripts/init.ts && npm start"
+# DB is initialized automatically by src/db/index.ts on first import
+CMD ["npm", "start"]

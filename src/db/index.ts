@@ -196,6 +196,33 @@ function initTables(db: Database.Database): void {
   }
 }
 
+function migrateColumns(db: Database.Database): void {
+  // Add columns that may be missing from older DB versions
+  const migrations = [
+    `ALTER TABLE contacts ADD COLUMN utm_source TEXT`,
+    `ALTER TABLE contacts ADD COLUMN utm_medium TEXT`,
+    `ALTER TABLE contacts ADD COLUMN utm_campaign TEXT`,
+    `ALTER TABLE contacts ADD COLUMN utm_content TEXT`,
+    `ALTER TABLE contacts ADD COLUMN pais TEXT`,
+    `ALTER TABLE contacts ADD COLUMN lead_magnet TEXT`,
+    `ALTER TABLE contacts ADD COLUMN estado_relacion TEXT DEFAULT 'lead_nuevo'`,
+    `ALTER TABLE contacts ADD COLUMN segmento TEXT`,
+    `ALTER TABLE contacts ADD COLUMN score_relacion INTEGER DEFAULT 0`,
+    `ALTER TABLE contacts ADD COLUMN canal_principal TEXT`,
+    `ALTER TABLE contacts ADD COLUMN ultima_interaccion_at INTEGER`,
+    `ALTER TABLE contacts ADD COLUMN ultima_compra_at INTEGER`,
+    `ALTER TABLE contacts ADD COLUMN valor_generado INTEGER DEFAULT 0`,
+    `ALTER TABLE contacts ADD COLUMN total_compras INTEGER DEFAULT 0`,
+  ];
+  for (const sql of migrations) {
+    try {
+      db.exec(sql);
+    } catch {
+      // Column already exists — safe to ignore
+    }
+  }
+}
+
 function seedDefaultStages(db: Database.Database): void {
   try {
     const result = db
@@ -238,6 +265,7 @@ function seedDefaultStages(db: Database.Database): void {
 
 const sqlite = createDatabase();
 initTables(sqlite);
+migrateColumns(sqlite);
 seedDefaultStages(sqlite);
 
 export const db = drizzle(sqlite, { schema });

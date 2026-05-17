@@ -20,13 +20,11 @@ RUN npm run build
 # Create data directory
 RUN mkdir -p data
 
-# Initialize database
-RUN npx tsx scripts/init.ts
-
 # Expose port
 EXPOSE 3000
 
 ENV NODE_ENV=production
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["npm", "start"]
+# Init DB on first run (if not exists), then start
+CMD sh -c "[ -f /app/data/crm.db ] || npx tsx scripts/init.ts && npm start"

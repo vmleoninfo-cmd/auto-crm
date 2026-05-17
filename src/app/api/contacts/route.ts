@@ -3,6 +3,16 @@ import { db } from "@/db";
 import { contacts } from "@/db/schema";
 import { eq, like, or, desc } from "drizzle-orm";
 
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS });
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search");
@@ -30,7 +40,7 @@ export async function GET(request: NextRequest) {
   }
 
   const results = query.orderBy(desc(contacts.createdAt)).all();
-  return NextResponse.json(results);
+  return NextResponse.json(results, { headers: CORS });
 }
 
 export async function POST(request: NextRequest) {
@@ -70,11 +80,11 @@ export async function POST(request: NextRequest) {
       .returning()
       .get();
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(result, { status: 201, headers: CORS });
   } catch (error) {
     return NextResponse.json(
       { error: `Error al crear contacto: ${error instanceof Error ? error.message : "Unknown"}` },
-      { status: 500 }
+      { status: 500, headers: CORS }
     );
   }
 }

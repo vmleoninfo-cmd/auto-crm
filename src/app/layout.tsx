@@ -13,9 +13,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Smart Tools CRM",
+  title: "GrowthCore CRM",
   description:
-    "CRM de ventas inteligente para negocios con Meta Ads y Google Ads. Parte del stack Smart Tools by Evoluciona Inteligente.",
+    "CRM inteligente de GrowthCore — gestión de leads, pipeline y decisiones con IA para negocios con Meta Ads.",
 };
 
 export default function RootLayout({

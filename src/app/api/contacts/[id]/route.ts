@@ -77,6 +77,17 @@ export async function PUT(
   if (body.temperature !== undefined) updateData.temperature = body.temperature;
   if (body.score !== undefined) updateData.score = Math.max(0, Math.min(100, body.score));
   if (body.notes !== undefined) updateData.notes = body.notes;
+  if (body.estadoRelacion !== undefined) updateData.estadoRelacion = body.estadoRelacion;
+  if (body.segmento !== undefined) updateData.segmento = body.segmento;
+  if (body.canalPrincipal !== undefined) updateData.canalPrincipal = body.canalPrincipal;
+  if (body.pais !== undefined) updateData.pais = body.pais;
+  if (body.leadMagnet !== undefined) updateData.leadMagnet = body.leadMagnet;
+  if (body.valorGenerado !== undefined) updateData.valorGenerado = body.valorGenerado;
+  if (body.totalCompras !== undefined) updateData.totalCompras = body.totalCompras;
+  if (body.utmSource !== undefined) updateData.utmSource = body.utmSource;
+  if (body.utmMedium !== undefined) updateData.utmMedium = body.utmMedium;
+  if (body.utmCampaign !== undefined) updateData.utmCampaign = body.utmCampaign;
+  if (body.utmContent !== undefined) updateData.utmContent = body.utmContent;
 
   const result = db
     .update(contacts)

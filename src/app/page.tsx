@@ -109,7 +109,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Centro de Comando</h1>
-        <p className="text-muted-foreground">Evoluciona Inteligente — visión ejecutiva del sistema</p>
+        <p className="text-muted-foreground">GrowthCore — visión ejecutiva del sistema</p>
       </div>
 
       {/* Zona 1 — Decisión Global */}

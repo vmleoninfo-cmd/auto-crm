@@ -1,14 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Bell, Menu } from "lucide-react";
+import { Search, Bell, Menu, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileNav } from "./MobileNav";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
@@ -37,6 +45,16 @@ export function Header() {
 
       <Button variant="ghost" size="icon" className="relative cursor-pointer">
         <Bell className="h-5 w-5" />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="cursor-pointer text-muted-foreground hover:text-destructive"
+        onClick={handleLogout}
+        title="Cerrar sesión"
+      >
+        <LogOut className="h-5 w-5" />
       </Button>
     </header>
   );
